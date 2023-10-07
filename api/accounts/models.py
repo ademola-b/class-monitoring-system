@@ -28,7 +28,7 @@ class User(AbstractUser):
 class Student(models.Model):
     student_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     user = models.OneToOneField(get_user_model(), null=True, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     level = models.CharField(max_length=5, choices=level_choices, default='100')
 
     def __str__(self):

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from dj_rest_auth.serializers import UserDetailsSerializer, PasswordChangeSerializer
 
-from . models import Student
+from . models import Student, Lecturer
 
 class UserDetailsSerializer(UserDetailsSerializer):
     class Meta(UserDetailsSerializer.Meta):
@@ -27,4 +27,16 @@ class StudentSerializer(serializers.ModelSerializer):
             'user',
             'department',
             'level'
+        ]
+
+class LecturerSerializer(serializers.ModelSerializer):
+
+    user = UserDetailsSerializer()
+
+    class Meta:
+        model = Lecturer
+        fields = [
+            'lect_id',
+            'user',
+            'course'
         ]
