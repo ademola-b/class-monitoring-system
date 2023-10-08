@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultButton.dart';
 import 'package:frontend/utils/defaultText.dart';
@@ -23,13 +24,13 @@ class _LoginState extends State<Login> {
     });
   }
 
-  // _login() async {
-  //   var isValid = _form.currentState!.validate();
-  //   if (!isValid) return;
-  //   _form.currentState!.save();
+  _login() async {
+    var isValid = _form.currentState!.validate();
+    if (!isValid) return;
+    _form.currentState!.save();
 
-  //   await RemoteServices.login(context, _username.toUpperCase(), _password);
-  // }
+    await RemoteServices.login(context, _username, _password);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,8 +87,7 @@ class _LoginState extends State<Login> {
                             width: size.width,
                             child: DefaultButton(
                               onPressed: () {
-                                // _login();
-                                Navigator.popAndPushNamed(context, '/navbar');
+                                _login();
                               },
                               text: 'Login',
                               textSize: 22.0,

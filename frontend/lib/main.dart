@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/bottomNavbar.dart';
+import 'package:frontend/screens/admin/add-user.dart';
+import 'package:frontend/screens/admin/dashboard.dart';
+import 'package:frontend/screens/admin/student.dart';
+import 'package:frontend/screens/lecturer/bottomNavbar.dart';
 import 'package:frontend/screens/login.dart';
 import 'package:frontend/screens/scan.dart';
+import 'package:frontend/screens/scanner/qr_scanner.dart';
+import 'package:frontend/screens/scanner/result.dart';
 import 'package:frontend/screens/splash.dart';
+import 'package:frontend/screens/studentNavbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPreferences;
@@ -20,11 +26,28 @@ Route<dynamic> getRoutes(RouteSettings settings) {
   switch (settings.name) {
     case '/':
       return _buildRoute(settings, const SplashScreen());
+    case '/admin-dashboard':
+      return _buildRoute(settings, const AdminDashboard());
 
-    case '/navbar':
-      return _buildRoute(settings, const Navbar());
+    case '/studentNavbar':
+      return _buildRoute(settings, const StudentNavbar());
+
+    case '/lecturerNavbar':
+      return _buildRoute(settings, const LecturerNavbar());
+
+    case '/student':
+      return _buildRoute(settings, const Student());
+    case '/lecturer':
+      return _buildRoute(settings, const Student());
+
     case '/scan':
-      return _buildRoute(settings, ScanQrPage());
+      return _buildRoute(settings, const Scan());
+
+    case '/result':
+      return _buildRoute(settings, const ScannedQR());
+
+    case '/addUser':
+      return _buildRoute(settings, const AddUser());
 
     default:
       return _buildRoute(settings, const SplashScreen());

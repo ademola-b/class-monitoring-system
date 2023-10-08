@@ -5,25 +5,14 @@ from . models import User, Student, Lecturer
 
 # Register your models here.
 class UserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'is_student', 'is_lecturer', 'is_active')
-    search_fields = ('username',)
+    list_display = ('username', 'name', 'email', 'date_joined', 'last_login', 'is_student', 'is_lecturer', 'is_staff', 'is_superuser',)
+    search_fields = ('username','name','email',)
     ordering = ('username',)
     readonly_fields = ('date_joined', 'last_login',)
 
-    fieldsets = (
-        ('User Information', {'fields': ('username', 'password', 'first_name', 'last_name', 'email', 'profile_pic')}),
-        ('Permissions', {'fields': (
-            'is_student', 'is_lecturer', 'is_staff', 'is_superuser', 'is_active')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
-        
-    )
-
-    add_fieldsets = (
-        ('Login Details', {
-            'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2'),
-        }),
-    )
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
 
 admin.site.register(User, UserAdmin)
 

@@ -7,8 +7,7 @@ class UserDetailsSerializer(UserDetailsSerializer):
     class Meta(UserDetailsSerializer.Meta):
         fields = [
             'pk',
-            'first_name',
-            'last_name',
+            'name',
             'username',
             'email',
             'is_staff',
@@ -18,7 +17,7 @@ class UserDetailsSerializer(UserDetailsSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
 
-    user = UserDetailsSerializer()
+    user = UserDetailsSerializer(required=False)
     
     class Meta:
         model = Student

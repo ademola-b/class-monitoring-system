@@ -2,19 +2,19 @@ import 'package:fancy_bottom_navigation_2/fancy_bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:frontend/screens/dashboard.dart';
+import 'package:frontend/screens/lecturer/dashboard.dart';
 import 'package:frontend/screens/more.dart';
-import 'package:frontend/screens/report.dart';
+import 'package:frontend/screens/admin/report.dart';
 import 'package:frontend/utils/constants.dart';
 
-class Navbar extends StatefulWidget {
-  const Navbar({super.key});
+class LecturerNavbar extends StatefulWidget {
+  const LecturerNavbar({super.key});
 
   @override
-  State<Navbar> createState() => _NavbarState();
+  State<LecturerNavbar> createState() => _LecturerNavbarState();
 }
 
-class _NavbarState extends State<Navbar> {
+class _LecturerNavbarState extends State<LecturerNavbar> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   int currentPage = 0;
   GlobalKey bottomNavigationKey = GlobalKey();

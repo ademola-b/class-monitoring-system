@@ -11,6 +11,7 @@ class Course(models.Model):
         return f"{self.code} - {self.title}"
     
 class Department(models.Model):
+    dept_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     deptName = models.CharField(max_length=50, unique=True)
     
     def __str__(self):

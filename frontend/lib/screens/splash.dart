@@ -1,5 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend/screens/admin/dashboard.dart';
 import 'package:frontend/screens/login.dart';
 import 'package:frontend/utils/constants.dart';
 
@@ -61,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ClipOval(
-                child: Image.asset("assets/images/checked_user.svg",
+                child: SvgPicture.asset("assets/images/checked_user.svg",
                     width: 250, height: 250),
               )
             ],
@@ -69,6 +71,6 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         backgroundColor: Constants.backgroundColor,
         splashIconSize: 300.0,
-        nextScreen: const Login());
+        nextScreen: const AdminDashboard());
   }
 }
