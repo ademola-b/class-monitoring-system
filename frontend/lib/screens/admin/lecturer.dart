@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:frontend/models/course_response.dart';
 import 'package:frontend/models/department_response.dart';
 import 'package:frontend/models/user_details_response.dart';
 import 'package:frontend/services/remote_services.dart';
@@ -143,14 +144,14 @@ class _LecturerState extends State<Lecturer> {
     if (!_isValid) return;
     _form.currentState!.save();
 
-    await RemoteServices.createStudent(context, data: [
+    await RemoteServices.createLecturer(context, data: [
       {
         "user": {
           "name": _name,
           "username": _regNo,
           "is_staff": false,
-          "is_student": true,
-          "is_lecturer": false
+          "is_student": false,
+          "is_lecturer": true
         },
         "course": _course
       }
@@ -165,14 +166,12 @@ class _LecturerState extends State<Lecturer> {
     regNo = TextEditingController(text: '');
   }
 
-
   _getCourses() async {
-    List<DepartmentResponse?>? depts =
-        await RemoteServices.departments(context);
-    if (depts!.isNotEmpty) {
+    List<CoursesResponse?>? courses = await RemoteServices.courses(context);
+    if (courses!.isNotEmpty) {
       setState(() {
-        for (var dept in depts) {
-          course_list[dept!.deptId] = dept.deptName;
+        for (var course in courses) {
+          course_list[course!.courseId] = course.title;
         }
       });
     } else {
@@ -212,7 +211,7 @@ class _LecturerState extends State<Lecturer> {
                       iconSize: 25,
                     ),
                     const DefaultText(
-                      text: "Add Student",
+                      text: "Add Lecturer",
                       size: 20.0,
                       color: Constants.primaryColor,
                     )
@@ -303,7 +302,6 @@ class _LecturerState extends State<Lecturer> {
                           },
                           validator: Constants.validator,
                         ),
-                        
                         const SizedBox(height: 20.0),
                         DefaultDropDown(
                           onSaved: (newVal) {
@@ -339,7 +337,7 @@ class _LecturerState extends State<Lecturer> {
                               onPressed: () {
                                 _addLecturer();
                               },
-                              text: "Add Student",
+                              text: "Add Lecturer",
                               textSize: 20.0),
                         )
                       ],

@@ -4,9 +4,10 @@ from django.shortcuts import render
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, ListCreateAPIView
-from . models import Student, Lecturer, Department
-from . serializers import StudentSerializer, LecturerSerializer
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.views import APIView
+from . models import Student, Lecturer, Department, Course, StudentQr
+from . serializers import StudentSerializer, LecturerSerializer, StudentQrSerializer
 
 
 default_password = '12345678'
@@ -124,18 +125,66 @@ class LecturerCreateView(CreateAPIView):
                 # create new user object
                 user = get_user_model().objects.create(
                     name = data['user']['name'],
-                    last_name = data['user']['last_name'],
                     username = data['user']['username'],
                     password = make_password(default_password),
-                    email = data['user']['email'],
+
                     is_lecturer = True,
                     is_active = True
                 )
 
                 Lecturer.objects.create(
                     user = user,
-                    course = data['course']
+                    course = Course.objects.get(course_id = data['course']) 
                 )
             return Response(lecturer_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(lecturer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentQrImageView(ListCreateAPIView):
+    queryset = StudentQr.objects.all()
+    serializer_class = StudentQrSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        request = self.request
+        user = request.user
+        if not user.is_authenticated:
+            return StudentQr.objects.none()
+        elif user.is_staff:
+            return StudentQr.objects.all()
+        elif user.is_student:
+            return StudentQr.objects.filter(registration_no = user.username)
+        else:
+            return StudentQr.objects.none()
+        
+
+    # def post(self, request):
+    #     data = request.data
+    #     serializer = StudentQrSerializer(data=data)
+    #     if serializer.is_valid():
+    #         print(f"data:{data}")
+    #         StudentQr.objects.create(
+    #             user = get_user_model().objects.get(user_id=data['user']),
+    #             qr_image = data['qr_image']
+    #         )
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentDetail(APIView):
+
+    def get(self, request, username):
+        try:
+            student = Student.objects.get(user__username = username)
+            serializer = StudentSerializer(student)
+            return Response(serializer.data)
+        except:
+            return Response(
+                {'error': "Student not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        
+
+

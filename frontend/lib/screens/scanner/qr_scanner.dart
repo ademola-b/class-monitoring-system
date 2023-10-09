@@ -27,24 +27,31 @@ class _ScanState extends State<Scan> {
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              DefaultText(text: "Place QR Code in the area"),
-              DefaultText(text: "Scanning will be automatically started"),
+              DefaultText(
+                text: "Place QR Code in the area",
+                size: 20.0,
+                weight: FontWeight.bold,
+              ),
+              DefaultText(
+                text: "Scanning will be automatically started",
+                size: 15.0,
+              ),
             ],
           )),
           Expanded(
               flex: 4,
               child: Stack(
-
-                children: [MobileScanner(
-                  allowDuplicates: true,
-                  onDetect: (barcode, args) {
-                  if (!isScanCompleted) {
-                    String code = barcode.rawValue ?? '------';
-                    isScanCompleted = true;
-                    Navigator.pushNamed(context, '/result');
-                  }
-                }),
-                
+                children: [
+                  MobileScanner(
+                      allowDuplicates: true,
+                      onDetect: (barcode, args) {
+                        if (!isScanCompleted) {
+                          String code = barcode.rawValue ?? '------';
+                          isScanCompleted = true;
+                          Navigator.pushNamed(context, '/result',
+                              arguments: {'code': code});
+                        }
+                      }),
                 ],
               ))
         ],

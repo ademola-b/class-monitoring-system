@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/admin/add-user.dart';
 import 'package:frontend/screens/admin/dashboard.dart';
+import 'package:frontend/screens/admin/lecturer.dart';
 import 'package:frontend/screens/admin/student.dart';
 import 'package:frontend/screens/lecturer/bottomNavbar.dart';
 import 'package:frontend/screens/login.dart';
@@ -37,14 +38,15 @@ Route<dynamic> getRoutes(RouteSettings settings) {
 
     case '/student':
       return _buildRoute(settings, const Student());
+
     case '/lecturer':
-      return _buildRoute(settings, const Student());
+      return _buildRoute(settings, const Lecturer());
 
     case '/scan':
       return _buildRoute(settings, const Scan());
 
     case '/result':
-      return _buildRoute(settings, const ScannedQR());
+      return _buildRoute(settings, ScannedQR(settings.arguments));
 
     case '/addUser':
       return _buildRoute(settings, const AddUser());

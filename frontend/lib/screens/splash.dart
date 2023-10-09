@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/screens/admin/dashboard.dart';
 import 'package:frontend/screens/login.dart';
+import 'package:frontend/screens/studentNavbar.dart';
 import 'package:frontend/utils/constants.dart';
 
 import '../main.dart';
@@ -71,6 +72,6 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         backgroundColor: Constants.backgroundColor,
         splashIconSize: 300.0,
-        nextScreen: const AdminDashboard());
+        nextScreen: const Login());
   }
 }

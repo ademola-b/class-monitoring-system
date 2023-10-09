@@ -22,3 +22,7 @@ class Attendance(models.Model):
     student = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=False, auto_now_add=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.student} - {self.course.code}"
+

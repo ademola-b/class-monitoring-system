@@ -13,6 +13,8 @@ class UserDetailsResponse {
     String? name;
     String? username;
     dynamic email;
+    String? profilePic;
+    String? picMem;
     bool? isStaff;
     bool? isStudent;
     bool? isLecturer;
@@ -22,6 +24,8 @@ class UserDetailsResponse {
         this.name,
         this.username,
         this.email,
+        this.profilePic,
+        this.picMem,
         this.isStaff,
         this.isStudent,
         this.isLecturer,
@@ -32,6 +36,8 @@ class UserDetailsResponse {
         name: json["name"],
         username: json["username"],
         email: json["email"],
+        profilePic: json["profile_pic"],
+        picMem: json["pic_mem"],
         isStaff: json["is_staff"],
         isStudent: json["is_student"],
         isLecturer: json["is_lecturer"],
@@ -42,6 +48,8 @@ class UserDetailsResponse {
         "name": name,
         "username": username,
         "email": email,
+        "profile_pic": profilePic,
+        "pic_mem": picMem,
         "is_staff": isStaff,
         "is_student": isStudent,
         "is_lecturer": isLecturer,

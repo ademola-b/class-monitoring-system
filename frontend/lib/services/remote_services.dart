@@ -1,15 +1,20 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
+import 'package:frontend/models/attendance_response.dart';
+import 'package:frontend/models/course_response.dart';
 import 'package:frontend/models/department_response.dart';
 import 'package:frontend/models/login_response.dart';
+import 'package:frontend/models/student_qr_response.dart';
 import 'package:frontend/models/student_response.dart';
 import 'package:frontend/models/user_details_response.dart';
 import 'package:frontend/services/urls.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class RemoteServices {
   static Future<UserDetailsResponse?>? userDetails(context) async {
@@ -85,6 +90,20 @@ class RemoteServices {
     }
   }
 
+  static Future<List<CoursesResponse>?>? courses(context) async {
+    try {
+      Response response = await http.get(coursesUrl, headers: {});
+      if (response.statusCode == 200) {
+        return coursesResponseFromJson(response.body);
+      } else {
+        throw Exception('Failed to get user details');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An Error Occurred: $e", false));
+    }
+  }
+
   static Future<StudentResponse?> createStudent(context,
       {List<Map<String, dynamic>>? data}) async {
     try {
@@ -115,5 +134,145 @@ class RemoteServices {
           Constants.snackBar(context, "An error occurred: $e", false));
     }
     return null;
+  }
+
+  static Future<StudentResponse?> createLecturer(context,
+      {List<Map<String, dynamic>>? data}) async {
+    try {
+      Response response = await http.post(
+        createLecturerUrl,
+        body: jsonEncode(data),
+        headers: <String, String>{
+          'content-type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+            context, "Lecturer Account Created Successfully", true));
+      } else {
+        var responseData = jsonDecode(response.body);
+        print(responseData);
+        for (var responses in responseData) {
+          for (var element in responses.keys) {
+            var value = responses[element];
+            ScaffoldMessenger.of(context)
+                .showSnackBar(Constants.snackBar(context, "$value", false));
+          }
+        }
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+    return null;
+  }
+
+  static Future<String> getQrImageBytes(String regNo) async {
+    final QrPainter painter = QrPainter(
+      data: regNo,
+      version: QrVersions.auto,
+      gapless: false,
+      color: Colors.black,
+      emptyColor: Colors.white,
+    );
+
+    final img = await painter.toImageData(200);
+
+    return base64Encode(img!.buffer.asUint8List());
+  }
+
+  static Future<void> saveQrImage(context, String regNo) async {
+    final qrImageData = await getQrImageBytes(regNo);
+
+    try {
+      var request = http.MultipartRequest('POST', saveStudentQr);
+      request.fields['registration_no'] = regNo;
+      request.files.add(http.MultipartFile(
+        'qr_image',
+        http.ByteStream.fromBytes(
+            Uint8List.fromList(base64.decode(qrImageData))),
+        base64.decode(qrImageData).length,
+        filename: 'qr_image.png', // You can choose any filename here
+        // contentType: MediaType('image', 'png'), // Specify the correct content type
+      ));
+
+      final response = await request.send();
+
+      print(response.stream.toString());
+      if (response.statusCode == 201) {
+        // Handle a successful response
+        ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+            context, "Student's Qr Saved Successfully", true));
+        // print('QrImage sent successfully');
+      } else {
+        // Handle errors
+        ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+            context, "Fail to Save Student's QrCode", false));
+        print('Failed to send QrImage to the API');
+      }
+    } catch (e) {
+      // Handle exceptions
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+  }
+
+  static Future<List<StudentQrResponse>?> studentQr(context) async {
+    try {
+      Response response = await http.get(saveStudentQr, headers: {
+        "Authorization": "Token ${sharedPreferences.getString('token')}"
+      });
+
+      if (response.statusCode == 200) {
+        return studentQrResponseFromJson(response.body);
+      } else {}
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+  }
+
+  static Future<StudentResponse?> studentDetail(context, String regNo) async {
+    try {
+      Response response = await http
+          .get(Uri.parse("$baseUrl/api/accounts/student-detail/$regNo/"));
+      if (response.statusCode == 200) {
+        return studentResponseFromJson(response.body);
+      } else {
+        var responseData = jsonDecode(response.body);
+        if (responseData['error'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+              context, "An error occurred: can't get student detail", false));
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+  }
+
+  static Future<AttendanceResponse?> markAttandance(
+      context, String student, String course) async {
+    try {
+      Response response = await http.post(markAttendanceUrl, body: {
+        student = student,
+        course = course,
+      });
+
+      if (response.statusCode == 201) {
+        return attendanceResponseFromJson(response.body);
+      } else {
+        var responseData = jsonDecode(response.body);
+        if (responseData['detail'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              Constants.snackBar(context, "${responseData['detail']}", false));
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
   }
 }

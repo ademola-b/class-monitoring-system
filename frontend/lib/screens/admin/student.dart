@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:frontend/models/department_response.dart';
@@ -13,6 +14,7 @@ import 'package:frontend/utils/defaultText.dart';
 import 'package:frontend/utils/defaultTextFormField.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class Student extends StatefulWidget {
   const Student({super.key});
@@ -145,6 +147,14 @@ class _StudentState extends State<Student> {
     });
   }
 
+  generateQrCode() {
+    QrImage(
+      data: _regNo,
+      size: 150,
+      version: QrVersions.auto,
+    );
+  }
+
   void _addStudent() async {
     var _isValid = _form.currentState!.validate();
     if (!_isValid) return;
@@ -164,25 +174,16 @@ class _StudentState extends State<Student> {
       }
     ]);
 
+    await RemoteServices.saveQrImage(context, _regNo);
+
     _reset();
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
   void _reset() async {
     name = TextEditingController(text: '');
     regNo = TextEditingController(text: '');
   }
-
-  // _getUser() async {
-  //   UserDetailsResponse? user = await RemoteServices.userDetails(context);
-  //   // return user;
-  //   user != null
-  //       ? setState(() {
-  //           examOfficerDept = user.deptId;
-  //         })
-  //       : ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
-  //           context, "Can't get exam officer details", false));
-  // }
 
   _getDepts() async {
     List<DepartmentResponse?>? depts =
@@ -381,8 +382,10 @@ class _StudentState extends State<Student> {
                         SizedBox(
                           width: size.width,
                           child: DefaultButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                // await generateQrCode();
                                 _addStudent();
+                                
                               },
                               text: "Add Student",
                               textSize: 20.0),

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from . models import User, Student, Lecturer
+from . models import User, Student, Lecturer, StudentQr
 
 # Register your models here.
 class UserAdmin(UserAdmin):
@@ -16,6 +16,6 @@ class UserAdmin(UserAdmin):
 
 admin.site.register(User, UserAdmin)
 
-models = [Student, Lecturer]
+models = [Student, Lecturer, StudentQr]
 for model in models:
     admin.site.register(model)

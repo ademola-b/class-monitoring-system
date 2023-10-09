@@ -53,7 +53,7 @@ class User(AbstractBaseUser):
     user_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     username = models.CharField(max_length=100, db_index=True, unique=True, blank=True, null=True)
     name = models.CharField(max_length=100, db_index=True, blank=True, null=True)
-    profile_pic = models.ImageField(upload_to='img/')
+    profile_pic = models.ImageField(upload_to='img/', default="img/default.jpg")
     email = models.CharField(max_length=100, db_index=True, unique=True, verbose_name='email address', null=True, blank=True)
     date_joined = models.DateTimeField(
         verbose_name='date_joined', auto_now_add=True)
@@ -84,16 +84,6 @@ class User(AbstractBaseUser):
         verbose_name_plural = 'Users'
 
 
-# class User(AbstractUser):
-#     user_id = models.UUIDField(
-#         default=uuid.uuid4, primary_key=True, unique=True, editable=False)
-#     email = models.CharField(max_length=100, db_index=True,
-#                              unique=True, verbose_name='email address', blank=True)
-#     profile_pic = models.ImageField(upload_to='img/')
-#     is_student = models.BooleanField(default=False, help_text="designates whether the user is a student")
-#     is_lecturer = models.BooleanField(default=False, help_text="designates whether the user is a lecturer")
-
-
 class Student(models.Model):
     student_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     user = models.OneToOneField(get_user_model(), null=True, on_delete=models.CASCADE)
@@ -102,6 +92,14 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.user.username}"
+
+class StudentQr(models.Model):
+    qr_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, primary_key=True)
+    registration_no = models.CharField(max_length=30, null=True)
+    qr_image = models.ImageField(upload_to='img/qr_code/')
+
+    def __str__(self):
+        return f"{self.registration_no}"
 
 class Lecturer(models.Model):
     lect_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
