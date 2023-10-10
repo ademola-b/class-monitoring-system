@@ -4,9 +4,10 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from accounts.models import Student, User
+from accounts.models import Student, User, Lecturer
 from . models import Department, Course, Attendance
-from . serializers import DepartmentSerializer, CourseSerializer, AttendanceSerializer
+from . serializers import (DepartmentSerializer, CourseSerializer, 
+                           AttendanceSerializer, AttendanceReportSerializer)
 # Create your views here.
 class DepartmentList(ListAPIView):
     queryset = Department.objects.all()
@@ -15,6 +16,7 @@ class DepartmentList(ListAPIView):
 class CourseList(ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
 
 class AttendanceView(ListCreateAPIView):
     queryset = Attendance.objects.all()
@@ -57,15 +59,33 @@ class AttendanceView(ListCreateAPIView):
             )
 
 
+class GenerateAttendanceListView(ListAPIView):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceReportSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        from_date = self.request.query_params.get("from")
+        to_date = self.request.query_params.get("to")
+        course = self.request.query_params.get('course')
+        
+        if not user.is_authenticated:
+            return Attendance.objects.none()
+        
+        if course is None:
+            if user.is_lecturer:
+                lecturer = Lecturer.objects.get(user = user)
+                return Attendance.objects.filter(date__date__range = (from_date, to_date), course = lecturer.course)
+            elif user.is_staff:
+                return Attendance.objects.filter(date__date__range = (from_date, to_date))
+            else:
+                return Attendance.objects.none()
+        else:
+            if user.is_staff:
+                return Attendance.objects.filter(date__date__range = (from_date, to_date), course = course)
+            else:
+                return Attendance.objects.none()
 
 
-        # data = self.request.data
-        # serializer = self.serializer_class(data=data)
-        # if serializer.is_valid():
-        #     try:
-        #         get_att = Attendance.objects.get(date__date = date.today, student__user__username = username)
 
-        #     except Attendance.DoesNotExist:
-        #         Attendance.objects.create(
-        #             student, course
-        #         )
+

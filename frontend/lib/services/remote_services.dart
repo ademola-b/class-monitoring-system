@@ -3,9 +3,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
+import 'package:frontend/models/attendance_report_response.dart';
 import 'package:frontend/models/attendance_response.dart';
 import 'package:frontend/models/course_response.dart';
 import 'package:frontend/models/department_response.dart';
+import 'package:frontend/models/lecturer_response.dart';
 import 'package:frontend/models/login_response.dart';
 import 'package:frontend/models/student_qr_response.dart';
 import 'package:frontend/models/student_response.dart';
@@ -25,6 +27,7 @@ class RemoteServices {
       if (response.statusCode == 200) {
         return userDetailsResponseFromJson(response.body);
       } else {
+        print(response.body);
         throw Exception('Failed to get user details');
       }
     } catch (e) {
@@ -51,7 +54,7 @@ class RemoteServices {
             } else if (user_details.isLecturer!) {
               Navigator.popAndPushNamed(context, '/lecturerNavbar');
             } else if (user_details.isStaff!) {
-              Navigator.popAndPushNamed(context, '/admin-dashboard');
+              Navigator.popAndPushNamed(context, '/adminNavbar');
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                   Constants.snackBar(context, "Invalid User Type", false));
@@ -253,23 +256,64 @@ class RemoteServices {
     }
   }
 
-  static Future<AttendanceResponse?> markAttandance(
+  static Future<AttendanceResponse?> markAttendance(
       context, String student, String course) async {
     try {
       Response response = await http.post(markAttendanceUrl, body: {
-        student = student,
-        course = course,
+        'student': student,
+        'course': course,
       });
 
       if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            Constants.snackBar(context, "Attendance suceesfully marked", true));
         return attendanceResponseFromJson(response.body);
       } else {
+        print("hi: ${response.body}");
         var responseData = jsonDecode(response.body);
         if (responseData['detail'] != null) {
           ScaffoldMessenger.of(context).showSnackBar(
               Constants.snackBar(context, "${responseData['detail']}", false));
         }
       }
+    } catch (e) {
+      print("err: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+  }
+
+  static Future<List<LecturerResponse>?> lecturerDetail(context) async {
+    try {
+      Response response = await http.get(lecturerDetailUrl, headers: {
+        "Authorization": "Token ${sharedPreferences.getString('token')}"
+      });
+      if (response.statusCode == 200) {
+        return lecturerResponseFromJson(response.body);
+      } else {
+        print(response.body);
+
+        ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+            context, "An error occurred: ${response.body}", false));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", false));
+    }
+  }
+
+  static Future<List<AttendanceReportResponse>?> attendanceList(
+      context, String from, String to, String course) async {
+    try {
+      Response response = await http.get(
+          Uri.parse("$baseUrl/api/report/?from=$from&to=$to&course=$course"),
+          headers: {
+            "Authorization": "Token ${sharedPreferences.getString('token')}"
+          });
+      if (response.statusCode == 200) {
+        print(jsonDecode(response.body));
+        return attendanceReportResponseFromJson(response.body);
+      } else {}
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           Constants.snackBar(context, "An error occurred: $e", false));

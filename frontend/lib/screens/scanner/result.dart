@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:frontend/models/course_response.dart';
+import 'package:frontend/models/lecturer_response.dart';
 import 'package:frontend/models/student_response.dart';
 import 'package:frontend/models/user_details_response.dart';
 import 'package:frontend/services/remote_services.dart';
@@ -23,15 +21,16 @@ class ScannedQR extends StatefulWidget {
 
 markAttendance(context, String regNo) async {
   // get student id
-
   StudentResponse? user = await RemoteServices.studentDetail(context, regNo);
-  if (user != null) {
-    var user_id = user.user!.pk;
-  }
+  var user_id = user!.user!.pk;
+
   // get lecturer course id
-  // CoursesResponse? course = await RemoteServices.
+  List<LecturerResponse>? lect_course =
+      await RemoteServices.lecturerDetail(context);
+  var lect_c = lect_course![0].course;
 
   // send request
+  await RemoteServices.markAttendance(context, user_id!, lect_c!);
 }
 
 class _ScannedQRState extends State<ScannedQR> {
@@ -39,7 +38,10 @@ class _ScannedQRState extends State<ScannedQR> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const DefaultText(text: "Student Details"),
+          title: DefaultText(
+            text: "Student Details",
+            color: Constants.backgroundColor,
+          ),
           centerTitle: true,
         ),
         body: Padding(
@@ -48,7 +50,6 @@ class _ScannedQRState extends State<ScannedQR> {
             child: Center(
                 child: Column(
               children: [
-                DefaultText(text: widget.arguments['code']),
                 FutureBuilder(
                     future: RemoteServices.studentDetail(
                         context, widget.arguments['code']),
@@ -69,13 +70,16 @@ class _ScannedQRState extends State<ScannedQR> {
                                 text: "Student's Name: ${data.user!.name!}",
                                 size: 20.0),
                             const SizedBox(height: 10.0),
-                            DefaultText(
-                                text: "${data.user!.username!}", size: 20.0),
+                            DefaultText(text: data.user!.username!, size: 20.0),
                             const SizedBox(height: 20.0),
                             SizedBox(
                               width: MediaQuery.of(context).size.width / 1.5,
                               child: DefaultButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    markAttendance(
+                                        context, widget.arguments['code']);
+                                    Navigator.pop(context);
+                                  },
                                   text: "Mark Attendance",
                                   textSize: 18.0),
                             )

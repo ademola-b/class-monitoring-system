@@ -12,8 +12,6 @@ class Constants {
   static final Color pillColor = Color(0xFFc01414);
   static final Color splashBackColor = Color(0xFFffefd8);
 
-  
-
   static String? validator(String? value) {
     if (value == null || value.isEmpty) {
       return "This Field is required";
@@ -59,7 +57,7 @@ class Constants {
                     Icon(
                       icon,
                       size: 70.0,
-                      color: Constants.backgroundColor,
+                      color: Colors.white,
                     ),
                     const SizedBox(height: 20.0),
                     DefaultText(
@@ -95,8 +93,6 @@ class Constants {
 
     return picked;
   }
-
-  
 
   static pickTime(context, DateTime pickedTime) async {
     var pickedTime = await showTimePicker(

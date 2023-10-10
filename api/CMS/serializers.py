@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from accounts.serializers import StudentSerializer
-from  accounts.models import User
+from accounts.serializers import UserDetailsSerializer
+from  accounts.models import User, Student
 from . models import Department, Course, Attendance
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -24,9 +24,30 @@ class UserMini(serializers.ModelSerializer):
             "username"
         ]
 
-class AttendanceSerializer(serializers.ModelSerializer):
-    
+class AttendanceSerializer(serializers.ModelSerializer):    
     class Meta:
         model = Attendance
-        fields = "__all__"
+        fields = [
+            "att_id",
+            "student",
+            "date",
+            "course"
+        ]
+
+class AttendanceReportSerializer(serializers.ModelSerializer):
+    student = UserDetailsSerializer()
+    course = CourseSerializer()
+
+    class Meta: 
+        model = Attendance
+        fields = [
+            "date",
+            "student",
+            "course"
+        ]
+        
+        
+       
+        
+    
         

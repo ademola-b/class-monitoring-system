@@ -4,10 +4,11 @@ from django.shortcuts import render
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from . models import Student, Lecturer, Department, Course, StudentQr
-from . serializers import StudentSerializer, LecturerSerializer, StudentQrSerializer
+from . serializers import (StudentSerializer, LecturerSerializer, 
+                           StudentQrSerializer, ChangePasswordSerializer)
 
 
 default_password = '12345678'
@@ -186,5 +187,24 @@ class StudentDetail(APIView):
             )
 
         
+class LecturerDetailsView(ListAPIView):
+    queryset = Lecturer.objects.all()
+    serializer_class = LecturerSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Lecturer.objects.none()
+        elif user.is_staff:
+            return Lecturer.objects.all()
+        elif user.is_lecturer:
+            return Lecturer.objects.filter(user = user)
+        else:
+            return Course.objects.none()
+
+
+class ChangePassword(UpdateAPIView):
+    queryset = get_user_model().objects.all()
+    serializer_class = ChangePasswordSerializer
 
 

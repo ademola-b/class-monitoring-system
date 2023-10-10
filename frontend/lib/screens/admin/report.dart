@@ -3,7 +3,13 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/models/attendance_report_response.dart';
+import 'package:frontend/models/attendance_response.dart';
+import 'package:frontend/models/course_response.dart';
+import 'package:frontend/services/remote_services.dart';
+import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultButton.dart';
+import 'package:frontend/utils/defaultDropDown.dart';
 import 'package:frontend/utils/defaultText.dart';
 import 'package:frontend/utils/defaultTextFormField.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,34 +24,42 @@ class ReportForm extends StatefulWidget {
 class _ReportFormState extends State<ReportForm> {
   final _form = GlobalKey<FormState>();
   DateTime pickedDate = DateTime.now();
-  TextEditingController _fromDate = TextEditingController();
-  TextEditingController _toDate = TextEditingController();
+  final TextEditingController _fromDate = TextEditingController();
+  final TextEditingController _toDate = TextEditingController();
+  Map course_list = {};
+  late String _course;
+  List<AttendanceReportResponse>? attRepo = [];
+  var dropdownvalue;
+
   // List<AttendanceReport>? attRepo = [];
 
-  // Future<void> _generateCSV() async {
-  //   // List<AttendanceReport>? data = await RemoteService.attendanceReport(
-  //   //     context, _fromDate.text, _toDate.text);
+  Future<void> _generateCSV() async {
+    // List<AttendanceReport>? data = await RemoteService.attendanceReport(
+    //     context, _fromDate.text, _toDate.text);
 
-  //   List<List<String>> csvData = [
-  //     <String>[
-  //       'Registration No',
-  //       'Full Name',
-  //     ],
-  //     ...attRepo!.map((item) => [
-  //           item.studentId.userId.username,
-  //           "${item.studentId.userId.firstName} ${item.studentId.userId.lastName}",
-  //         ])
-  //   ];
-  //   String csv = const ListToCsvConverter().convert(csvData);
+    List<List<String>> csvData = [
+      <String>[
+        "${attRepo![0].course!.code!} - ${attRepo![0].course!.title!}",
+        attRepo![0].date!.toIso8601String(),
+      ],
+      <String>[
+        'Name',
+        'Registration No',
+      ],
+      ...attRepo!.map((item) => [
+            item.student!.name!,
+            item.student!.username!,
+          ])
+    ];
+    String csv = const ListToCsvConverter().convert(csvData);
 
-  //   // final String dir = (await getExternalStorageDirectory())!.path;
-  //   final String dir = (await getDownloadPath(context));
-  //   final String path = "$dir/report-${_fromDate.text}to${_toDate.text}.csv";
-  //   // print(path);
-  //   final File file = File(path);
+    final String dir = (await getDownloadPath(context));
+    final String path = "$dir/report-${_fromDate.text}to${_toDate.text}.csv";
+    // print(path);
+    final File file = File(path);
 
-  //   await file.writeAsString(csv);
-  // }
+    await file.writeAsString(csv);
+  }
 
   // get download path
   Future<String> getDownloadPath(context) async {
@@ -67,67 +81,71 @@ class _ReportFormState extends State<ReportForm> {
     return dir!.path;
   }
 
-  // _submit() async {
-  //   var isValid = _form.currentState!.validate();
-  //   if (!isValid) return;
-  //   _form.currentState!.save();
+  _submit() async {
+    var isValid = _form.currentState!.validate();
+    if (!isValid) return;
+    _form.currentState!.save();
 
-  //   List<AttendanceReport>? attReport = await RemoteService.attendanceReport(
-  //       context, _fromDate.text, _toDate.text);
+    List<AttendanceReportResponse>? attReport =
+        await RemoteServices.attendanceList(
+            context, _fromDate.text, _toDate.text, _course);
 
-  //   if (attReport != null && attReport.isNotEmpty) {
-  //     // print("Report: $attReport");
-  //     setState(() {
-  //       attRepo = [];
-  //       attRepo = [...attRepo!, ...attReport];
-  //     });
-  //     // print("Att Report: $attRepo");
-  //     showModalBottomSheet(
-  //         context: context,
-  //         builder: (builder) {
-  //           return SizedBox(
-  //             height: 500,
-  //             width: MediaQuery.of(context).size.width,
-  //             child: Padding(
-  //               padding: const EdgeInsets.only(top: 20.0),
-  //               child: Column(
-  //                 mainAxisAlignment: MainAxisAlignment.center,
-  //                 children: [
-  //                   Icon(
-  //                     Icons.check_circle_outline_rounded,
-  //                     size: 150.0,
-  //                     color: Constants.primaryColor,
-  //                   ),
-  //                   const SizedBox(height: 10.0),
-  //                   const DefaultText(
-  //                       size: 18.0, text: "Successfully Generated"),
-  //                   const SizedBox(height: 30.0),
-  //                   SizedBox(
-  //                     width: MediaQuery.of(context).size.width * 0.8,
-  //                     child: DefaultButton(
-  //                         onPressed: () async {
-  //                           _generateCSV();
-  //                           Navigator.pop(context);
-  //                           await Constants.DialogBox(
-  //                               context,
-  //                               "Report Exported",
-  //                               Constants.primaryColor,
-  //                               Icons.info_outline_rounded);
-  //                           Navigator.pop(context);
-  //                         },
-  //                         text: "Export",
-  //                         textSize: 20.0),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         });
-  //   } else {
-  //     Constants.DialogBox(context, "No attendance on the selected date range",
-  //         Constants.primaryColor, Icons.info_outline_rounded);
-  //   }
-  // }
+    if (attReport != null && attReport.isNotEmpty) {
+      setState(() {
+        attRepo = [];
+        attRepo = [...attRepo!, ...attReport];
+      });
+      // print("Att Report: $attRepo");
+      showModalBottomSheet(
+          context: context,
+          builder: (builder) {
+            return SizedBox(
+              height: 500,
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline_rounded,
+                      size: 150.0,
+                      color: Constants.primaryColor,
+                    ),
+                    const SizedBox(height: 10.0),
+                    const DefaultText(
+                        size: 18.0, text: "Successfully Generated"),
+                    const SizedBox(height: 30.0),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: DefaultButton(
+                          onPressed: () async {
+                            _generateCSV();
+                            Navigator.pop(context);
+                            // await Constants.dialogBox(context)
+                            await Constants.dialogBox(context,
+                                text: "Report Exported",
+                                color: Constants.primaryColor,
+                                icon: Icons.info_outline_rounded,
+                                textColor: Colors.white);
+                            Navigator.pop(context);
+                          },
+                          text: "Export",
+                          textSize: 20.0),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+    } else {
+      Constants.dialogBox(context,
+          text: "No attendance on the provided data",
+          color: Constants.primaryColor,
+          icon: Icons.info_outline_rounded,
+          textColor: Colors.white);
+    }
+  }
 
   pickDate() async {
     var picked = await showDatePicker(
@@ -153,6 +171,27 @@ class _ReportFormState extends State<ReportForm> {
     await pickDate();
     _toDate.text =
         "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day}";
+  }
+
+  _getCourses() async {
+    List<CoursesResponse?>? courses = await RemoteServices.courses(context);
+    if (courses!.isNotEmpty) {
+      setState(() {
+        for (var course in courses) {
+          course_list[course!.courseId] = course.title;
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(Constants.snackBar(context, "No Course", false));
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getCourses();
   }
 
   @override
@@ -205,6 +244,35 @@ class _ReportFormState extends State<ReportForm> {
                             },
                             label: 'to date',
                             fontSize: 15.0),
+                        const SizedBox(height: 20.0),
+                        DefaultDropDown(
+                          onSaved: (newVal) {
+                            _course = newVal;
+                          },
+                          validator: (value) {
+                            if (value == null) return "field is required";
+                            return null;
+                          },
+                          value: dropdownvalue,
+                          onChanged: (newVal) {
+                            setState(() {
+                              dropdownvalue = newVal!;
+                            });
+                          },
+                          dropdownMenuItemList: course_list
+                              .map((key, value) => MapEntry(
+                                  key,
+                                  DropdownMenuItem(
+                                      value: key,
+                                      child: DefaultText(
+                                        text: value.toString(),
+                                        color: Constants.primaryColor,
+                                      ))))
+                              .values
+                              .toList(),
+                          text: "Course",
+                        ),
+                        const SizedBox(height: 50.0),
                       ],
                     ),
                   )),
@@ -214,7 +282,7 @@ class _ReportFormState extends State<ReportForm> {
                 width: MediaQuery.of(context).size.width,
                 child: DefaultButton(
                     onPressed: () {
-                      // _submit();
+                      _submit();
                     },
                     text: 'Generate Report',
                     textSize: 18))

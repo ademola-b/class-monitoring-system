@@ -25,18 +25,8 @@ class UserDetailsSerializer(UserDetailsSerializer):
             with default_storage.open(user.profile_pic.name, 'rb') as loadedfile:
                 return base64.b64encode(loadedfile.read())
 
-class UserMini(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            "name",
-            "username"
-        ]
-
-
 class StudentSerializer(serializers.ModelSerializer):
 
-    # user = UserMini()
     user = UserDetailsSerializer(required=False)
     
     class Meta:
@@ -48,9 +38,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'level'
         ]
        
-        
-        
-
+           
 class LecturerSerializer(serializers.ModelSerializer):
 
     user = UserDetailsSerializer(required=False)
@@ -78,3 +66,6 @@ class StudentQrSerializer(serializers.ModelSerializer):
         if qr.qr_image.name is not None:
             with default_storage.open(qr.qr_image.name, 'rb') as loadedfile:
                 return base64.b64encode(loadedfile.read())
+
+class ChangePasswordSerializer(PasswordChangeSerializer):
+    old_password = serializers.CharField(required=True)

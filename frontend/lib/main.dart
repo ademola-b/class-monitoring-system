@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/admin/add-user.dart';
+import 'package:frontend/screens/admin/adminNavbar.dart';
 import 'package:frontend/screens/admin/dashboard.dart';
 import 'package:frontend/screens/admin/lecturer.dart';
 import 'package:frontend/screens/admin/student.dart';
@@ -10,13 +11,17 @@ import 'package:frontend/screens/scanner/qr_scanner.dart';
 import 'package:frontend/screens/scanner/result.dart';
 import 'package:frontend/screens/splash.dart';
 import 'package:frontend/screens/studentNavbar.dart';
+import 'package:frontend/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPreferences;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   sharedPreferences = await SharedPreferences.getInstance();
-  runApp(const MaterialApp(
+  runApp(MaterialApp(
+    theme: ThemeData(
+        appBarTheme: AppBarTheme(
+            backgroundColor: Constants.backgroundColor, elevation: 0.0)),
     debugShowCheckedModeBanner: false,
     initialRoute: '/',
     onGenerateRoute: getRoutes,
@@ -27,11 +32,18 @@ Route<dynamic> getRoutes(RouteSettings settings) {
   switch (settings.name) {
     case '/':
       return _buildRoute(settings, const SplashScreen());
+
+    case '/login':
+      return _buildRoute(settings, const Login());
+
     case '/admin-dashboard':
       return _buildRoute(settings, const AdminDashboard());
 
     case '/studentNavbar':
       return _buildRoute(settings, const StudentNavbar());
+
+    case '/adminNavbar':
+      return _buildRoute(settings, const AdminNavbar());
 
     case '/lecturerNavbar':
       return _buildRoute(settings, const LecturerNavbar());

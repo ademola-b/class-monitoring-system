@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 
+
 # Create your models here.
 class Course(models.Model):
     course_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)

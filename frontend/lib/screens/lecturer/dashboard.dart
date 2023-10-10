@@ -84,22 +84,14 @@ class _DashboardState extends State<Dashboard> {
                     ],
                   ),
                   const SizedBox(height: 20.0),
-                  DefaultButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/scan');
-                      },
-                      text: "SCAN",
-                      textSize: 18.0),
-                  DefaultContainer(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        children: [
-                          DefaultButton(
-                              onPressed: () {}, text: "SCAN", textSize: 18.0),
-                        ],
-                      ),
-                    ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 1.5,
+                    child: DefaultButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/scan');
+                        },
+                        text: "SCAN",
+                        textSize: 18.0),
                   ),
                 ],
               ),

@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:frontend/screens/admin/sidebar.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/dateContainer.dart';
 import 'package:frontend/utils/defaultContainer.dart';
@@ -45,7 +42,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return SafeArea(
         child: Scaffold(
       backgroundColor: Constants.backgroundColor,
-      drawer: Sidebar(),
       appBar: AppBar(
         title: const Text("Dashboard"),
         centerTitle: true,

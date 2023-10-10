@@ -5,6 +5,8 @@
 import 'dart:convert';
 
 AttendanceResponse attendanceResponseFromJson(String str) => AttendanceResponse.fromJson(json.decode(str));
+List<AttendanceResponse> attendanceListResponseFromJson(String str) => List<AttendanceResponse>.from(json.decode(str).map((x) => AttendanceResponse.fromJson(x)));
+
 
 String attendanceResponseToJson(AttendanceResponse data) => json.encode(data.toJson());
 
