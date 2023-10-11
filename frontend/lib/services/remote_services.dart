@@ -7,8 +7,10 @@ import 'package:frontend/models/attendance_report_response.dart';
 import 'package:frontend/models/attendance_response.dart';
 import 'package:frontend/models/course_response.dart';
 import 'package:frontend/models/department_response.dart';
+import 'package:frontend/models/full_user_response.dart';
 import 'package:frontend/models/lecturer_response.dart';
 import 'package:frontend/models/login_response.dart';
+import 'package:frontend/models/password_change_response.dart';
 import 'package:frontend/models/student_qr_response.dart';
 import 'package:frontend/models/student_response.dart';
 import 'package:frontend/models/user_details_response.dart';
@@ -36,6 +38,23 @@ class RemoteServices {
     }
   }
 
+  static Future<FullUserDetailResponse?>? fullUserDetails(context) async {
+    try {
+      Response response = await http.get(fullUserUrl, headers: {
+        'Authorization': "Token ${sharedPreferences.getString('token')}"
+      });
+      if (response.statusCode == 200) {
+        return fullUserDetailResponseFromJson(response.body);
+      } else {
+        print(response.body);
+        throw Exception('Failed to get user details');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An Error Occurred: $e", false));
+    }
+  }
+
   static Future<LoginResponse?> login(
       context, String username, String password) async {
     try {
@@ -50,10 +69,13 @@ class RemoteServices {
               await RemoteServices.userDetails(context);
           if (user_details != null) {
             if (user_details.isStudent!) {
+              sharedPreferences.setBool("staff", user_details.isStaff);
               Navigator.popAndPushNamed(context, '/studentNavbar');
             } else if (user_details.isLecturer!) {
+              sharedPreferences.setBool("staff", user_details.isStaff);
               Navigator.popAndPushNamed(context, '/lecturerNavbar');
-            } else if (user_details.isStaff!) {
+            } else if (user_details.isStaff) {
+              sharedPreferences.setBool("staff", user_details.isStaff);
               Navigator.popAndPushNamed(context, '/adminNavbar');
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -120,6 +142,7 @@ class RemoteServices {
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
             context, "Student Account Created Successfully", true));
+        Navigator.pop(context);
       } else {
         var responseData = jsonDecode(response.body);
         print(responseData);
@@ -265,11 +288,10 @@ class RemoteServices {
       });
 
       if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            Constants.snackBar(context, "Attendance suceesfully marked", true));
+        ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
+            context, "Attendance successfully marked", true));
         return attendanceResponseFromJson(response.body);
       } else {
-        print("hi: ${response.body}");
         var responseData = jsonDecode(response.body);
         if (responseData['detail'] != null) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -303,20 +325,88 @@ class RemoteServices {
   }
 
   static Future<List<AttendanceReportResponse>?> attendanceList(
-      context, String from, String to, String course) async {
+      context, String from, String to,
+      {String? course}) async {
     try {
-      Response response = await http.get(
-          Uri.parse("$baseUrl/api/report/?from=$from&to=$to&course=$course"),
-          headers: {
-            "Authorization": "Token ${sharedPreferences.getString('token')}"
-          });
-      if (response.statusCode == 200) {
-        print(jsonDecode(response.body));
-        return attendanceReportResponseFromJson(response.body);
-      } else {}
+      if (course == null) {
+        Response response = await http
+            .get(Uri.parse("$baseUrl/api/report/?from=$from&to=$to"), headers: {
+          "Authorization": "Token ${sharedPreferences.getString('token')}"
+        });
+        if (response.statusCode == 200) {
+          print(jsonDecode(response.body));
+          return attendanceReportResponseFromJson(response.body);
+        } else {
+          throw Exception("Failed to get attendance history");
+        }
+      } else {
+        Response response = await http.get(
+            Uri.parse("$baseUrl/api/report/?from=$from&to=$to&course=$course"),
+            headers: {
+              "Authorization": "Token ${sharedPreferences.getString('token')}"
+            });
+        if (response.statusCode == 200) {
+          print(jsonDecode(response.body));
+          return attendanceReportResponseFromJson(response.body);
+        } else {
+          throw Exception("Failed to get attendance history");
+        }
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           Constants.snackBar(context, "An error occurred: $e", false));
     }
+  }
+
+  static Future<PasswordChangeResponse?> passwordChange(
+      context, String? oldPass, String? newPass, String? conPass) async {
+    try {
+      Response response = await http.post(passwordChangeUrl,
+          headers: <String, String>{
+            "content-type": "application/json; charset=UTF-8",
+            "Authorization": "Token ${sharedPreferences.getString('token')}"
+          },
+          body: jsonEncode({
+            'old_password': oldPass,
+            'new_password1': newPass,
+            'new_password2': conPass,
+          }));
+      var responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (responseData['detail'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              Constants.snackBar(context, "${responseData['detail']}", true));
+        }
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      } else {
+        if (responseData['new_password1'] != null) {
+          String output = '';
+          for (var element in responseData['new_password1']) {
+            output += element + "\n";
+          }
+          ScaffoldMessenger.of(context)
+              .showSnackBar(Constants.snackBar(context, output, false));
+        } else if (responseData['new_password2'] != null) {
+          String output = '';
+          for (var element in responseData['new_password2']) {
+            output += element + "\n";
+          }
+          ScaffoldMessenger.of(context)
+              .showSnackBar(Constants.snackBar(context, output, false));
+        } else if (responseData['old_password'] != null) {
+          String output = '';
+          for (var element in responseData['old_password']) {
+            output += element + "\n";
+          }
+          ScaffoldMessenger.of(context)
+              .showSnackBar(Constants.snackBar(context, output, false));
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          Constants.snackBar(context, "An error occurred: $e", true));
+    }
+
+    return null;
   }
 }

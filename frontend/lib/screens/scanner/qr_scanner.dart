@@ -20,9 +20,9 @@ class _ScanState extends State<Scan> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: DefaultText(
+          title: const DefaultText(
             text: "Scan QR",
-            color: Constants.backgroundColor,
+            // color: Constants.backgroundColor,
           ),
           centerTitle: true,
         ),

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user_details_response.dart';
+import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/dateContainer.dart';
 import 'package:frontend/utils/defaultContainer.dart';
@@ -20,21 +22,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Timer? timer;
   double? indicatorValue;
 
-  final String _username = 'Username';
+  String _username = 'Username';
 
-  // updateSeconds() {
-  //   timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
-  //     setState(() {
-  //       indicatorValue = DateTime.now().second / 60;
-  //     });
-  //   });
-  // }
+  _getUser() async {
+    UserDetailsResponse? user = await RemoteServices.userDetails(context);
+    setState(() {
+      _username = user!.username!;
+    });
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // updateSeconds();
+    _getUser();
   }
 
   @override

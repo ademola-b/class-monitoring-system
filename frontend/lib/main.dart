@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/change_password.dart';
 import 'package:frontend/screens/admin/add-user.dart';
 import 'package:frontend/screens/admin/adminNavbar.dart';
 import 'package:frontend/screens/admin/dashboard.dart';
@@ -62,6 +63,9 @@ Route<dynamic> getRoutes(RouteSettings settings) {
 
     case '/addUser':
       return _buildRoute(settings, const AddUser());
+
+    case '/changePassword':
+      return _buildRoute(settings, const ChangePassword());
 
     default:
       return _buildRoute(settings, const SplashScreen());

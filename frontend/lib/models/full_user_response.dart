@@ -1,42 +1,39 @@
 // To parse this JSON data, do
 //
-//     final userDetailsResponse = userDetailsResponseFromJson(jsonString);
+//     final fullUserDetailResponse = fullUserDetailResponseFromJson(jsonString);
 
 import 'dart:convert';
 
-UserDetailsResponse userDetailsResponseFromJson(String str) => UserDetailsResponse.fromJson(json.decode(str));
+FullUserDetailResponse fullUserDetailResponseFromJson(String str) => FullUserDetailResponse.fromJson(json.decode(str));
 
-String userDetailsResponseToJson(UserDetailsResponse data) => json.encode(data.toJson());
+String fullUserDetailResponseToJson(FullUserDetailResponse data) => json.encode(data.toJson());
 
-class UserDetailsResponse {
+class FullUserDetailResponse {
     String? pk;
     String? name;
     String? username;
     dynamic email;
-    String? profilePic;
     String? picMem;
-    bool isStaff;
+    bool? isStaff;
     bool? isStudent;
     bool? isLecturer;
 
-    UserDetailsResponse({
+    FullUserDetailResponse({
         this.pk,
         this.name,
         this.username,
         this.email,
-        this.profilePic,
         this.picMem,
-        required this.isStaff,
+        this.isStaff,
         this.isStudent,
         this.isLecturer,
     });
 
-    factory UserDetailsResponse.fromJson(Map<String, dynamic> json) => UserDetailsResponse(
+    factory FullUserDetailResponse.fromJson(Map<String, dynamic> json) => FullUserDetailResponse(
         pk: json["pk"],
         name: json["name"],
         username: json["username"],
         email: json["email"],
-        profilePic: json["profile_pic"],
         picMem: json["pic_mem"],
         isStaff: json["is_staff"],
         isStudent: json["is_student"],
@@ -48,7 +45,6 @@ class UserDetailsResponse {
         "name": name,
         "username": username,
         "email": email,
-        "profile_pic": profilePic,
         "pic_mem": picMem,
         "is_staff": isStaff,
         "is_student": isStudent,

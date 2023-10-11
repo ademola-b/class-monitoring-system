@@ -38,9 +38,8 @@ class _ScannedQRState extends State<ScannedQR> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: DefaultText(
+          title: const DefaultText(
             text: "Student Details",
-            color: Constants.backgroundColor,
           ),
           centerTitle: true,
         ),
@@ -78,7 +77,7 @@ class _ScannedQRState extends State<ScannedQR> {
                                   onPressed: () {
                                     markAttendance(
                                         context, widget.arguments['code']);
-                                    Navigator.pop(context);
+                                    // Navigator.pop(context);
                                   },
                                   text: "Mark Attendance",
                                   textSize: 18.0),

@@ -49,6 +49,8 @@ AUTH_USER_MODEL = 'accounts.User'
 
 REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserDetailsSerializer',
+    'OLD_PASSWORD_FIELD_ENABLED': True
+
 }
 
 REST_FRAMEWORK = {

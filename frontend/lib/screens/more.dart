@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/main.dart';
+import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultText.dart';
 
@@ -20,17 +21,15 @@ class _MoreState extends State<More> {
 
   final List<String> _labels = [
     // "Personal Information",
-    "Change password",
-    // "About Application",
+    "Change Password",
   ];
 
   final List<IconData> _labelIcons = [
     // Icons.person,
     Icons.lock,
-    // Icons.add,
   ];
 
-  final List<String> _labelRoutes = ['/profile', '/changePassword', '/about'];
+  final List<String> _labelRoutes = ['/changePassword'];
 
   @override
   void initState() {
@@ -49,44 +48,47 @@ class _MoreState extends State<More> {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        height: 150.0,
-                        width: 150.0,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100.0),
-                          border: Border.all(
-                              color: Constants.splashBackColor, width: 4.0),
-                          image: const DecorationImage(
-                            image: AssetImage("assets/images/default.jpg"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      //   FutureBuilder(
-                      //       future: RemoteServices.userResponse(context),
-                      //       builder: (context, snapshot) {
-                      //         if (snapshot.hasData) {
-                      //           return Column(
-                      //             children: [
-                      //               DefaultText(
-                      //                 size: 25.0,
-                      //                 text: snapshot.data!.name,
-                      //                 weight: FontWeight.bold,
-                      //                 color: Constants.splashBackColor,
-                      //               ),
-                      //               DefaultText(
-                      //                   size: 18.0,
-                      //                   text: snapshot.data!.username,
-                      //                   color: Constants.splashBackColor,
-                      //                   weight: FontWeight.bold),
-                      //             ],
-                      //           );
-                      //         }
-
-                      //         return CircularProgressIndicator(
-                      //           color: Constants.splashBackColor,
-                      //         );
-                      //       })
+                      FutureBuilder(
+                          future: RemoteServices.fullUserDetails(context),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Column(
+                                children: [
+                                  Container(
+                                    height: 150.0,
+                                    width: 150.0,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                      border: Border.all(
+                                          color: Constants.splashBackColor,
+                                          width: 4.0),
+                                      image: DecorationImage(
+                                        image: MemoryImage(base64Decode(
+                                            snapshot.data!.picMem!)),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  DefaultText(
+                                    text: snapshot.data!.name!,
+                                    size: 20.0,
+                                    color: Constants.splashBackColor,
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                  DefaultText(
+                                      text: snapshot.data!.username!,
+                                      color: Constants.splashBackColor,
+                                      size: 20.0),
+                                  const SizedBox(height: 10.0),
+                                ],
+                              );
+                            } else {
+                              return const DefaultText(
+                                  text: "Can't get user profile ", size: 15.0);
+                            }
+                            // return const CircularProgressIndicator();
+                          }),
                     ],
                   ),
                 ),

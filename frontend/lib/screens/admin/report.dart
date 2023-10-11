@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/main.dart';
 import 'package:frontend/models/attendance_report_response.dart';
 import 'package:frontend/models/attendance_response.dart';
 import 'package:frontend/models/course_response.dart';
@@ -30,6 +31,7 @@ class _ReportFormState extends State<ReportForm> {
   late String _course;
   List<AttendanceReportResponse>? attRepo = [];
   var dropdownvalue;
+  List<AttendanceReportResponse>? attReport;
 
   // List<AttendanceReport>? attRepo = [];
 
@@ -86,16 +88,24 @@ class _ReportFormState extends State<ReportForm> {
     if (!isValid) return;
     _form.currentState!.save();
 
-    List<AttendanceReportResponse>? attReport =
-        await RemoteServices.attendanceList(
-            context, _fromDate.text, _toDate.text, _course);
+    if (sharedPreferences.getBool("staff")!) {
+      attReport = await RemoteServices.attendanceList(
+          context, _fromDate.text, _toDate.text,
+          course: _course);
+    } else {
+      attReport = await RemoteServices.attendanceList(
+        context,
+        _fromDate.text,
+        _toDate.text,
+      );
+    }
 
-    if (attReport != null && attReport.isNotEmpty) {
+    if (attReport != null && attReport!.isNotEmpty) {
+      print(attReport);
       setState(() {
         attRepo = [];
-        attRepo = [...attRepo!, ...attReport];
+        attRepo = [...attRepo!, ...attReport!];
       });
-      // print("Att Report: $attRepo");
       showModalBottomSheet(
           context: context,
           builder: (builder) {
@@ -149,10 +159,20 @@ class _ReportFormState extends State<ReportForm> {
 
   pickDate() async {
     var picked = await showDatePicker(
-        context: context,
-        initialDate: pickedDate,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2030));
+      context: context,
+      initialDate: pickedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+                colorScheme: ColorScheme.light(
+                    primary: Constants.primaryColor,
+                    onPrimary: Constants.splashBackColor,
+                    onSurface: Constants.pillColor)),
+            child: child!);
+      },
+    );
 
     if (picked != null && picked != pickedDate) {
       setState(() {
@@ -245,33 +265,35 @@ class _ReportFormState extends State<ReportForm> {
                             label: 'to date',
                             fontSize: 15.0),
                         const SizedBox(height: 20.0),
-                        DefaultDropDown(
-                          onSaved: (newVal) {
-                            _course = newVal;
-                          },
-                          validator: (value) {
-                            if (value == null) return "field is required";
-                            return null;
-                          },
-                          value: dropdownvalue,
-                          onChanged: (newVal) {
-                            setState(() {
-                              dropdownvalue = newVal!;
-                            });
-                          },
-                          dropdownMenuItemList: course_list
-                              .map((key, value) => MapEntry(
-                                  key,
-                                  DropdownMenuItem(
-                                      value: key,
-                                      child: DefaultText(
-                                        text: value.toString(),
-                                        color: Constants.primaryColor,
-                                      ))))
-                              .values
-                              .toList(),
-                          text: "Course",
-                        ),
+                        sharedPreferences.getBool("staff")!
+                            ? DefaultDropDown(
+                                onSaved: (newVal) {
+                                  _course = newVal;
+                                },
+                                validator: (value) {
+                                  if (value == null) return "field is required";
+                                  return null;
+                                },
+                                value: dropdownvalue,
+                                onChanged: (newVal) {
+                                  setState(() {
+                                    dropdownvalue = newVal!;
+                                  });
+                                },
+                                dropdownMenuItemList: course_list
+                                    .map((key, value) => MapEntry(
+                                        key,
+                                        DropdownMenuItem(
+                                            value: key,
+                                            child: DefaultText(
+                                              text: value.toString(),
+                                              color: Constants.primaryColor,
+                                            ))))
+                                    .values
+                                    .toList(),
+                                text: "Course",
+                              )
+                            : const SizedBox.shrink(),
                         const SizedBox(height: 50.0),
                       ],
                     ),

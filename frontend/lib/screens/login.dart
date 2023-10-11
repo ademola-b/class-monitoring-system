@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultButton.dart';
@@ -46,8 +47,10 @@ class _LoginState extends State<Login> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset("assets/images/logo.png",
-                      width: 200.0, height: 200.0),
+                  ClipOval(
+                    child: SvgPicture.asset("assets/images/checked_user.svg",
+                        width: 150, height: 150),
+                  ),
                   const SizedBox(height: 20.0),
                   Form(
                       key: _form,

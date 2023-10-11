@@ -6,6 +6,24 @@ from dj_rest_auth.serializers import UserDetailsSerializer, PasswordChangeSerial
 from . models import Student, Lecturer, StudentQr, User
 
 class UserDetailsSerializer(UserDetailsSerializer):
+    # pic_mem = serializers.SerializerMethodField("get_image_memory")
+    class Meta(UserDetailsSerializer.Meta):
+        fields = [
+            # 'pk',
+            'name',
+            'username',
+            'email',
+            'is_staff',
+            'is_student', 
+            'is_lecturer',
+        ]
+
+    # def get_image_memory(request, user:User):
+    #     with default_storage.open(user.profile_pic.name, 'rb') as loadedfile:
+    #         return base64.b64encode(loadedfile.read())
+
+
+class FullUserDetailsSerializer(UserDetailsSerializer):
     pic_mem = serializers.SerializerMethodField("get_image_memory")
     class Meta(UserDetailsSerializer.Meta):
         fields = [
@@ -13,7 +31,6 @@ class UserDetailsSerializer(UserDetailsSerializer):
             'name',
             'username',
             'email',
-            'profile_pic',
             "pic_mem",
             'is_staff',
             'is_student', 
@@ -21,13 +38,14 @@ class UserDetailsSerializer(UserDetailsSerializer):
         ]
 
     def get_image_memory(request, user:User):
-        if user.profile_pic.name is not None:
-            with default_storage.open(user.profile_pic.name, 'rb') as loadedfile:
-                return base64.b64encode(loadedfile.read())
+        with default_storage.open(user.profile_pic.name, 'rb') as loadedfile:
+            return base64.b64encode(loadedfile.read())
+
+
 
 class StudentSerializer(serializers.ModelSerializer):
 
-    user = UserDetailsSerializer(required=False)
+    user = FullUserDetailsSerializer(required=False)
     
     class Meta:
         model = Student
@@ -63,9 +81,8 @@ class StudentQrSerializer(serializers.ModelSerializer):
         ]
 
     def get_image_memory(request, qr:StudentQr):
-        if qr.qr_image.name is not None:
-            with default_storage.open(qr.qr_image.name, 'rb') as loadedfile:
-                return base64.b64encode(loadedfile.read())
+        with default_storage.open(qr.qr_image.name, 'rb') as loadedfile:
+            return base64.b64encode(loadedfile.read())
 
 class ChangePasswordSerializer(PasswordChangeSerializer):
     old_password = serializers.CharField(required=True)

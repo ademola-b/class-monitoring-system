@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:frontend/models/student_qr_response.dart';
+import 'package:frontend/models/user_details_response.dart';
 import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/dateContainer.dart';
@@ -27,36 +28,31 @@ class _StudentDashboardState extends State<StudentDashboard> {
   double? indicatorValue;
   List<StudentQrResponse>? stdQr;
 
-  final String _username = 'Username';
+  String _username = 'Username';
 
   updateSeconds() {
     timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
-      setState(() {
-        indicatorValue = DateTime.now().second / 60;
-      });
+      if (mounted) {
+        setState(() {
+          indicatorValue = DateTime.now().second / 60;
+        });
+      }
     });
   }
 
-  getQrImage() async {
-    List<StudentQrResponse>? _studentQr =
-        await RemoteServices.studentQr(context);
-    if (_studentQr!.isNotEmpty) {
-      print("hello");
-      setState(() {
-        stdQr = _studentQr;
-        print(_studentQr[0].qrMem);
-      });
-    } else {}
-
-    print(stdQr);
+  _getUser() async {
+    UserDetailsResponse? user = await RemoteServices.userDetails(context);
+    setState(() {
+      _username = user!.username!;
+    });
   }
 
   @override
   void initState() {
-    getQrImage();
     // TODO: implement initState
     super.initState();
     updateSeconds();
+    _getUser();
   }
 
   @override
@@ -103,26 +99,26 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     ],
                   ),
                   const SizedBox(height: 20.0),
-                  Image.memory(stdQr![0].qrMem!),
+                  // Image.memory(stdQr![0].qrMem!),
 
-                  // FutureBuilder(
-                  //     future: RemoteServices.studentQr(context),
-                  //     builder: (context, snapshot) {
-                  //       if (snapshot.hasData && snapshot.data!.isEmpty) {
-                  //         return SizedBox(
-                  //           child: DefaultText(
-                  //             text: "No QrCode Found, kindly contact the admin",
-                  //             size: 18.0,
-                  //             color: Constants.pillColor,
-                  //             align: TextAlign.center,
-                  //           ),
-                  //         );
-                  //       } else if (snapshot.hasData) {
-                  //         var data = snapshot.data![0];
-                  //         return Image.memory(data.qrMem!);
-                  //       }
-                  //       return const CircularProgressIndicator();
-                  //     })
+                  FutureBuilder(
+                      future: RemoteServices.studentQr(context),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data!.isEmpty) {
+                          return SizedBox(
+                            child: DefaultText(
+                              text: "No QrCode Found, kindly contact the admin",
+                              size: 18.0,
+                              color: Constants.pillColor,
+                              align: TextAlign.center,
+                            ),
+                          );
+                        } else if (snapshot.hasData) {
+                          var data = snapshot.data![0];
+                          return Image.memory(data.qrMem!);
+                        }
+                        return const CircularProgressIndicator();
+                      })
                   // // QR Code to be displayed here
                 ],
               ),

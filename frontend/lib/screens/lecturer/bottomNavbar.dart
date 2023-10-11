@@ -39,7 +39,7 @@ class _LecturerNavbarState extends State<LecturerNavbar> {
             title: "Home",
           ),
           TabData(
-            iconData: Icons.report,
+            iconData: Icons.note,
             title: "Report",
           ),
           TabData(
