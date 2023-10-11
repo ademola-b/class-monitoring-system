@@ -1,8 +1,5 @@
 import 'package:fancy_bottom_navigation_2/fancy_bottom_navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:frontend/screens/lecturer/dashboard.dart';
 import 'package:frontend/screens/more.dart';
 import 'package:frontend/screens/admin/report.dart';
 import 'package:frontend/screens/student/student_dashboard.dart';
