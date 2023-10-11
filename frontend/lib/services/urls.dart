@@ -1,4 +1,4 @@
-String baseUrl = 'http://192.168.2.113:8000';
+String baseUrl = 'http://192.168.2.122:8000';
 // String baseUrl = 'http://192.168.88.182:8000';
 
 Uri loginUrl = Uri.parse("$baseUrl/api/accounts/login/");

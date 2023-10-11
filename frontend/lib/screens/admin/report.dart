@@ -101,10 +101,40 @@ class _ReportFormState extends State<ReportForm> {
     }
 
     if (attReport != null && attReport!.isNotEmpty) {
-      print(attReport);
+      // print(attReport);
       setState(() {
         attRepo = [];
         attRepo = [...attRepo!, ...attReport!];
+        Table(
+          border: TableBorder.all(),
+          columnWidths: const {
+            0: FractionColumnWidth(0.4), // Adjust column widths as needed
+            1: FractionColumnWidth(0.6),
+          },
+          children: [
+            const TableRow(children: [
+              TableCell(
+                child: DefaultText(
+                  text: "NAME",
+                  size: 18.0,
+                ),
+              ),
+              TableCell(
+                child: DefaultText(
+                  text: "REGISTRATION NUMBER",
+                  size: 18.0,
+                ),
+              ),
+            ]),
+            for (var item in attReport!)
+              TableRow(
+                children: [
+                  TableCell(child: DefaultText(text: item.student!.name)),
+                  TableCell(child: DefaultText(text: item.student!.username)),
+                ],
+              ),
+          ],
+        );
       });
       showModalBottomSheet(
           context: context,
@@ -114,37 +144,88 @@ class _ReportFormState extends State<ReportForm> {
               width: MediaQuery.of(context).size.width,
               child: Padding(
                 padding: const EdgeInsets.only(top: 20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline_rounded,
-                      size: 150.0,
-                      color: Constants.primaryColor,
-                    ),
-                    const SizedBox(height: 10.0),
-                    const DefaultText(
-                        size: 18.0, text: "Successfully Generated"),
-                    const SizedBox(height: 30.0),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: DefaultButton(
-                          onPressed: () async {
-                            _generateCSV();
-                            Navigator.pop(context);
-                            // await Constants.dialogBox(context)
-                            await Constants.dialogBox(context,
-                                text: "Report Exported",
-                                color: Constants.primaryColor,
-                                icon: Icons.info_outline_rounded,
-                                textColor: Colors.white);
-                            Navigator.pop(context);
+                child: sharedPreferences.getBool("staff")!
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 150.0,
+                            color: Constants.primaryColor,
+                          ),
+                          const SizedBox(height: 10.0),
+                          const DefaultText(
+                              size: 18.0, text: "Successfully Generated"),
+                          const SizedBox(height: 30.0),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: DefaultButton(
+                                onPressed: () async {
+                                  _generateCSV();
+                                  Navigator.pop(context);
+                                  // await Constants.dialogBox(context)
+                                  await Constants.dialogBox(context,
+                                      text: "Report Exported",
+                                      color: Constants.primaryColor,
+                                      icon: Icons.info_outline_rounded,
+                                      textColor: Colors.white);
+                                  Navigator.pop(context);
+                                },
+                                text: "Export",
+                                textSize: 20.0),
+                          ),
+                        ],
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Table(
+                          border: TableBorder.all(),
+                          columnWidths: const {
+                            0: FractionColumnWidth(
+                                0.4), // Adjust column widths as needed
+                            1: FractionColumnWidth(0.6),
                           },
-                          text: "Export",
-                          textSize: 20.0),
-                    ),
-                  ],
-                ),
+                          children: [
+                            const TableRow(children: [
+                              TableCell(
+                                child: Center(
+                                  child: DefaultText(
+                                    text: "NAME",
+                                    size: 15.0,
+                                    weight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Center(
+                                  child: DefaultText(
+                                    text: "REGISTRATION NUMBER",
+                                    size: 15.0,
+                                    weight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ]),
+                            for (var item in attReport!)
+                              TableRow(
+                                children: [
+                                  TableCell(
+                                      child: Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child:
+                                        DefaultText(text: item.student!.name),
+                                  )),
+                                  TableCell(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: DefaultText(
+                                        text: item.student!.username),
+                                  )),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
               ),
             );
           });
