@@ -7,6 +7,7 @@ import 'package:frontend/models/attendance_report_response.dart';
 import 'package:frontend/models/attendance_response.dart';
 import 'package:frontend/models/course_response.dart';
 import 'package:frontend/models/department_response.dart';
+import 'package:frontend/models/full_student_detail_response.dart';
 import 'package:frontend/models/full_user_response.dart';
 import 'package:frontend/models/lecturer_response.dart';
 import 'package:frontend/models/login_response.dart';
@@ -260,13 +261,15 @@ class RemoteServices {
     }
   }
 
-  static Future<StudentResponse?> studentDetail(context, String regNo) async {
+  static Future<FullStudentResponse?> studentDetail(
+      context, String regNo) async {
     try {
-      Response response = await http
-          .get(Uri.parse("$baseUrl/api/accounts/student-detail/$regNo/"));
+      Response response = await http.get(
+          Uri.parse("$baseUrl/api/accounts/student-detail/?username=$regNo"));
       if (response.statusCode == 200) {
-        return studentResponseFromJson(response.body);
+        return fullStudentResponseFromJson(response.body);
       } else {
+        
         var responseData = jsonDecode(response.body);
         if (responseData['error'] != null) {
           ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
@@ -293,6 +296,7 @@ class RemoteServices {
         return attendanceResponseFromJson(response.body);
       } else {
         var responseData = jsonDecode(response.body);
+        print("darae $responseData");
         if (responseData['detail'] != null) {
           ScaffoldMessenger.of(context).showSnackBar(
               Constants.snackBar(context, "${responseData['detail']}", false));

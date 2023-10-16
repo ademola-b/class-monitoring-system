@@ -9,7 +9,7 @@ class UserDetailsSerializer(UserDetailsSerializer):
     # pic_mem = serializers.SerializerMethodField("get_image_memory")
     class Meta(UserDetailsSerializer.Meta):
         fields = [
-            # 'pk',
+            'pk',
             'name',
             'username',
             'email',
@@ -31,6 +31,7 @@ class FullUserDetailsSerializer(UserDetailsSerializer):
             'name',
             'username',
             'email',
+            'profile_pic',
             "pic_mem",
             'is_staff',
             'is_student', 
@@ -42,8 +43,20 @@ class FullUserDetailsSerializer(UserDetailsSerializer):
             return base64.b64encode(loadedfile.read())
 
 
-
 class StudentSerializer(serializers.ModelSerializer):
+
+    user = UserDetailsSerializer(required=False)
+    
+    class Meta:
+        model = Student
+        fields = [
+            'student_id',
+            'user',
+            'department',
+            'level'
+        ]
+
+class FullStudentSerializer(serializers.ModelSerializer):
 
     user = FullUserDetailsSerializer(required=False)
     

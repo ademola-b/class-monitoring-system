@@ -51,3 +51,4 @@ class FullUserDetailResponse {
         "is_lecturer": isLecturer,
     };
 }
+

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frontend/models/full_student_detail_response.dart';
 import 'package:frontend/models/lecturer_response.dart';
 import 'package:frontend/models/student_response.dart';
 import 'package:frontend/models/user_details_response.dart';
@@ -21,8 +22,8 @@ class ScannedQR extends StatefulWidget {
 
 markAttendance(context, String regNo) async {
   // get student id
-  StudentResponse? user = await RemoteServices.studentDetail(context, regNo);
-  var user_id = user!.user!.pk;
+  FullStudentResponse? student = await RemoteServices.studentDetail(context, regNo);
+  var user_id = student!.user!.pk;
 
   // get lecturer course id
   List<LecturerResponse>? lect_course =
@@ -57,6 +58,7 @@ class _ScannedQRState extends State<ScannedQR> {
                         var data = snapshot.data;
                         return Column(
                           children: [
+                            
                             ClipOval(
                                 child: Image.memory(
                               base64Decode(data!.user!.picMem!),
@@ -89,6 +91,7 @@ class _ScannedQRState extends State<ScannedQR> {
                         color: Constants.splashBackColor,
                       );
                     })
+              
               ],
             )),
           ),

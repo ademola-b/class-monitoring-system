@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from . models import User, Student, Lecturer, Department, Course, StudentQr
-from . serializers import (StudentSerializer, LecturerSerializer, FullUserDetailsSerializer,
+from . serializers import (StudentSerializer, LecturerSerializer, 
+                           FullUserDetailsSerializer,FullStudentSerializer,
                            StudentQrSerializer, ChangePasswordSerializer)
 
 
@@ -19,8 +20,9 @@ class UserDetail(APIView):
 
     def get(self, request):
         try:
-            
+            print("hello")
             user = self.request.user
+            print(f"{user}")
             student = User.objects.get(user_id = user.user_id)
             serializer = FullUserDetailsSerializer(student)
             return Response(serializer.data)
@@ -36,7 +38,7 @@ class StudentCreateView(CreateAPIView):
 
     def post(self, request):
         student_data = request.data
-        student_serializer = StudentSerializer(data=student_data, many=True)
+        student_serializer = StudentSerializer(data=student_data)
         if student_serializer.is_valid():
             print(f'student: {student_data}')
 
@@ -124,12 +126,25 @@ class StudentQrImageView(ListCreateAPIView):
 
 
 class StudentDetail(APIView):
+    # queryset = Student.objects.all()
+    # serializer_class = StudentSerializer
 
-    def get(self, request, username):
+    # def get_queryset(self):
+    #     username = self.request.query_params.get("username")
+    #     # request = self.request
+    #     # if not self.request.user.is_authenticated:
+    #     #     return Student.objects.none()
+    #     # else:
+    #     return Student.objects.filter(user__username = username)
+    
+
+    def get(self, request):
+        username = request.query_params.get("username")
         try:
-            student = Student.objects.get(user__username = username)
-            serializer = StudentSerializer(student)
-            return Response(serializer.data)
+            if username is not None:
+                student = Student.objects.get(user__username = username)
+                serializer = FullStudentSerializer(student)
+                return Response(serializer.data)
         except:
             return Response(
                 {'error': "Student not found"}, status=status.HTTP_404_NOT_FOUND

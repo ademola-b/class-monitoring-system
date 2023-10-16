@@ -53,7 +53,7 @@ class User(AbstractBaseUser):
     user_id = models.UUIDField(default=uuid.uuid4, primary_key=True, unique=True, editable=False)
     username = models.CharField(max_length=100, db_index=True, unique=True, blank=True, null=True)
     name = models.CharField(max_length=100, db_index=True, blank=True, null=True)
-    profile_pic = models.ImageField(upload_to='img/', default="img/default.jpg")
+    profile_pic = models.ImageField(upload_to='img/', default="static/default.jpg")
     email = models.CharField(max_length=100, db_index=True, unique=True, verbose_name='email address', null=True, blank=True)
     date_joined = models.DateTimeField(
         verbose_name='date_joined', auto_now_add=True)

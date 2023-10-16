@@ -48,6 +48,19 @@ class _MoreState extends State<More> {
                 Center(
                   child: Column(
                     children: [
+                      // Container(
+                      //   height: 150.0,
+                      //   width: 150.0,
+                      //   decoration: BoxDecoration(
+                      //     borderRadius: BorderRadius.circular(100.0),
+                      //     border: Border.all(
+                      //         color: Constants.splashBackColor, width: 4.0),
+                      //     image: const DecorationImage(
+                      //       image: AssetImage("assets/images/default.jpg"),
+                      //       fit: BoxFit.cover,
+                      //     ),
+                      //   ),
+                      // ),
                       FutureBuilder(
                           future: RemoteServices.fullUserDetails(context),
                           builder: (context, snapshot) {
@@ -84,8 +97,11 @@ class _MoreState extends State<More> {
                                 ],
                               );
                             } else {
-                              return const DefaultText(
-                                  text: "Can't get user profile ", size: 15.0);
+                              return DefaultText(
+                                text: "Can't get user profile ",
+                                size: 20.0,
+                                color: Constants.splashBackColor,
+                              );
                             }
                             // return const CircularProgressIndicator();
                           }),

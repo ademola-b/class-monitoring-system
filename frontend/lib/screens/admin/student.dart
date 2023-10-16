@@ -54,7 +54,7 @@ class _StudentState extends State<Student> {
     );
   }
 
-  void _addStudent() async {
+  void _addStudent(context) async {
     var _isValid = _form.currentState!.validate();
     if (!_isValid) return;
     _form.currentState!.save();
@@ -226,7 +226,7 @@ class _StudentState extends State<Student> {
                           child: DefaultButton(
                               onPressed: () async {
                                 // await generateQrCode();
-                                _addStudent();
+                                _addStudent(context);
                                 
                               },
                               text: "Add Student",
