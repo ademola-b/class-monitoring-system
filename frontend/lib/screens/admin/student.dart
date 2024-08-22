@@ -1,18 +1,10 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:frontend/models/department_response.dart';
-import 'package:frontend/models/user_details_response.dart';
 import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultButton.dart';
-import 'package:frontend/utils/defaultContainer.dart';
 import 'package:frontend/utils/defaultDropDown.dart';
 import 'package:frontend/utils/defaultText.dart';
 import 'package:frontend/utils/defaultTextFormField.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -59,21 +51,20 @@ class _StudentState extends State<Student> {
     if (!_isValid) return;
     _form.currentState!.save();
 
-    await RemoteServices.createStudent(context, data: [
-      {
-        "user": {
-          "name": _name,
-          "username": _regNo,
-          "is_staff": false,
-          "is_student": true,
-          "is_lecturer": false
-        },
-        "department": _dept,
-        "level": _level
-      }
-    ]);
-
-    await RemoteServices.saveQrImage(context, _regNo);
+    if (await RemoteServices.createStudent(context, data: {
+      "user": {
+        "name": _name,
+        "username": _regNo,
+        "is_staff": false,
+        "is_student": true,
+        "is_lecturer": false
+      },
+      "department": _dept,
+      "level": _level
+    })) {
+      await RemoteServices.saveQrImage(context, _regNo);
+    }
+    
 
     _reset();
     // Navigator.pop(context);
@@ -137,7 +128,6 @@ class _StudentState extends State<Student> {
                   ],
                 ),
                 const SizedBox(height: 50.0),
-                
                 Form(
                     key: _form,
                     child: Column(
@@ -227,7 +217,6 @@ class _StudentState extends State<Student> {
                               onPressed: () async {
                                 // await generateQrCode();
                                 _addStudent(context);
-                                
                               },
                               text: "Add Student",
                               textSize: 20.0),

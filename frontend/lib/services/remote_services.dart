@@ -130,8 +130,7 @@ class RemoteServices {
     }
   }
 
-  static Future<StudentResponse?> createStudent(context,
-      {List<Map<String, dynamic>>? data}) async {
+  static Future<bool> createStudent(context, {dynamic data}) async {
     try {
       Response response = await http.post(
         createStudentUrl,
@@ -143,7 +142,7 @@ class RemoteServices {
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
             context, "Student Account Created Successfully", true));
-        Navigator.pop(context);
+        return true;
       } else {
         var responseData = jsonDecode(response.body);
         print(responseData);
@@ -160,7 +159,7 @@ class RemoteServices {
       ScaffoldMessenger.of(context).showSnackBar(
           Constants.snackBar(context, "An error occurred: $e", false));
     }
-    return null;
+    return false;
   }
 
   static Future<StudentResponse?> createLecturer(context,
@@ -231,6 +230,7 @@ class RemoteServices {
         // Handle a successful response
         ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(
             context, "Student's Qr Saved Successfully", true));
+        Navigator.pop(context);
         // print('QrImage sent successfully');
       } else {
         // Handle errors
@@ -269,7 +269,6 @@ class RemoteServices {
       if (response.statusCode == 200) {
         return fullStudentResponseFromJson(response.body);
       } else {
-        
         var responseData = jsonDecode(response.body);
         if (responseData['error'] != null) {
           ScaffoldMessenger.of(context).showSnackBar(Constants.snackBar(

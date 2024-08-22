@@ -3,13 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/full_student_detail_response.dart';
 import 'package:frontend/models/lecturer_response.dart';
-import 'package:frontend/models/student_response.dart';
-import 'package:frontend/models/user_details_response.dart';
+
 import 'package:frontend/services/remote_services.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/defaultButton.dart';
 import 'package:frontend/utils/defaultText.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class ScannedQR extends StatefulWidget {
   final arguments;

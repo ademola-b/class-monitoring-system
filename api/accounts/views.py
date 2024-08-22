@@ -26,7 +26,7 @@ class UserDetail(APIView):
             student = User.objects.get(user_id = user.user_id)
             serializer = FullUserDetailsSerializer(student)
             return Response(serializer.data)
-        except:
+        except Exception as e:
             return Response(
                 {'error': "User not found"}, status=status.HTTP_404_NOT_FOUND
             )
@@ -40,24 +40,23 @@ class StudentCreateView(CreateAPIView):
         student_data = request.data
         student_serializer = StudentSerializer(data=student_data)
         if student_serializer.is_valid():
-            print(f'student: {student_data}')
 
-            for data in student_data:
-                print(f"data - {data}")
-                # create new user object
-                user = get_user_model().objects.create(
-                    name = data['user']['name'],
-                    username = data['user']['username'],
+                # create new user and student object
+            user = get_user_model().objects.create(
+                    name = student_data['user']['name'],
+                    username = student_data['user']['username'],
                     password = make_password(default_password),
                     is_student = True,
                     is_active = True
                 )
-
-                Student.objects.create(
+            
+            Student.objects.create(
                     user = user,
-                    department = Department.objects.get(dept_id = data['department']) ,
-                    level = data['level']
+                    department = Department.objects.get(dept_id = student_data['department']) ,
+                    level = student_data['level']
                 )
+                
+                
             return Response(student_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

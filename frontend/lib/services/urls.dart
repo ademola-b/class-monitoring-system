@@ -1,5 +1,5 @@
-// String baseUrl = 'http://192.168.2.122:8000';
-String baseUrl = 'http://classmonitoring.pythonanywhere.com';
+// String baseUrl = 'http://192.168.73.182:8000';
+String baseUrl = 'http://hackerton.pythonanywhere.com';
 
 Uri loginUrl = Uri.parse("$baseUrl/api/accounts/login/");
 Uri userUrl = Uri.parse("$baseUrl/api/accounts/user/");

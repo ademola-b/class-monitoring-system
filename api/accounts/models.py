@@ -7,10 +7,11 @@ from django.db import models
 from CMS.models import Course, Department
 
 level_choices = [
-    ('ND I', 'ND I'),
-    ('ND II', 'ND II'),
-    ('HND I', 'HND I'),
-    ('HND II', 'HND II')
+    ('100', '100'),
+    ('200', '200'),
+    ('300', '300'),
+    ('400', '400'),
+    ('500', '500')
 ]
 
 # Create your models here.
